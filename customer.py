@@ -4,7 +4,7 @@ class Customer:
         self._last_name = last_name
         self._id = id
         self._phone = phone
-        self._debt = debt
+        self._debt = int(debt)
         self._date = date
 
     @property
@@ -14,7 +14,7 @@ class Customer:
     @property
     def debt(self):
         return self._debt
-    @debt.setter
+    
     def add_debt(self, debt):
         if type(debt) is not int:
             print("Error: debt is not an int")
