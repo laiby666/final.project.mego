@@ -1,9 +1,9 @@
 import sys
 import os
-from customer import Customer, CustomerActions
+from customer import Customer
 import threading
 import socket
-
+from commands import Commands
 host = '127.0.0.1'
 port = 12345 
 
@@ -42,11 +42,11 @@ while True:
 
 def choose_action(client_sock):
     while True:
-        command = client_sock.recv(2048).split(" ")
-        if command[0] == "select":
-            customer.select(command)
-        if command[0] == "set":
-            customer.set(command)
+        command:str = client_sock.recv(2048)
+        if command.startswith("select"):
+            Commands.select(command, customers)
+        elif command.startswith("set"):
+            Commands.set(command, customers)
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind((host, port))
