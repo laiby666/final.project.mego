@@ -17,20 +17,20 @@ if not os.path.exists(csv_file):
         pass
 
 
-customers = []
+customers:list[Customer] = []
 with open(csv_file, "r") as fd:
     for line in fd.readlines():
-        fileds = line.split(",")
-        id = fileds[2]
+        fields = line.split(",")
+        id = fields[2]
         for customer in customers:
             if customer.id == id:
-                customer.add_debt(int(fileds[4]))                
+                customer.add_debt(int(fields[4]))                
                 break
         else:
-            customer = Customer(*fileds)
-            customers.append(customer)
+            customer = Customer(*fields)
+            Commands.sort_list_by_debt(customers, customer)
 
-customers.sort(key=lambda customer: customer.debt)
+# customers.sort(key=lambda customer: customer.debt)
 for customer in customers:
     print(customer)
 
