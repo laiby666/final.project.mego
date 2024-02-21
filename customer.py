@@ -1,11 +1,12 @@
+
 class Customer:
-    def __init__(self, first_name, last_name, id, phone, debt, date) -> None:
+    def __init__(self, first_name, last_name, id, phone, debt, the_date) -> None:
         self._first_name = first_name
         self._last_name = last_name
         self._id = id
         self._phone = phone
         self._debt = float(debt)
-        self._date = date
+        self._date = the_date
 
     @property
     def first_name(self):
@@ -33,4 +34,4 @@ class Customer:
         self._debt += debt
 
     def __str__(self):
-        return f"name: {self._first_name} {self._last_name}, id: {self._id}, phone: {self.phone} debt: {self._debt}"
+        return f'''name: {self._first_name:<7} {self._last_name:<20} id: {self._id:<17} phone: {self.phone:<20} debt: {self._debt:<20}'''
