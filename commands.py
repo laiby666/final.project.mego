@@ -83,11 +83,20 @@ class Commands:
         elif customer.debt <= list[0].debt:
             list.insert(0, customer)
         else:
-            for i in range(len(list)):
-                if customer.debt <= list[i].debt:
-                    list.insert(i, customer)
+            i, j = 0, len(list)-1
+            while i<=j:
+                mid = (i+j)//2
+                if customer.debt > list[mid].debt and customer.debt< list[mid+1].debt:
+                    list.insert(mid+1, customer)
                     break
-
+                if customer.debt == list[mid].debt:
+                    list.insert(mid, customer)
+                    return
+                if list[mid].debt < customer.debt:
+                    i = mid+1   
+                else:
+                    j = mid-1
+            
     def select(command:str, customers:list[Customer]):
         if command.startswith(("select debt<","select debt>")):
             Commands.debt_less_or_more_than(command, customers)
@@ -98,11 +107,16 @@ class Commands:
 
     def set(command, customers):
         pass
-
-li = [Customer(*"Moshe,Cohen,12345678,0501234567,-45,12/02/2024".split(",")),
-Customer(*"Avraham,Levi,12345644,0501234555,300,11/01/2024".split(",")),
-Customer(*"Meir,Reich,12345655,0501234444,-500,12/01/2024".split(",")),
-Customer(*"Noach,Paloch,12345666,0501234566,-20,12/02/2024".split(",")),
-Customer(*"Moshe,Cohen,12345678,0501234567,-55,13/02/2024".split(","))]
-command = "select first name!=Moshe"
-Commands.select(command, li)
+    
+if __name__ == "__main__":
+    li = [Customer(*"Moshe,Cohen,12345678,0501234567,-45,12/02/2024".split(",")),
+    Customer(*"Avraham,Levi,12345644,0501234555,300,11/01/2024".split(",")),
+    Customer(*"Meir,Reich,12345655,0501234444,-500,12/01/2024".split(",")),
+    Customer(*"Noach,Paloch,12345666,0501234566,-255,12/02/2024".split(",")),
+    Customer(*"Moshe,Cohen,12345678,0501234567,-55,13/02/2024".split(",")),
+    Customer(*"Mali,Cohen,57235678,0501987667,8000,13/02/2024".split(",")),
+    Customer(*"Koral,Nisim,12712678,0506324567,-255,13/02/2024".split(",")),
+    Customer(*"Merav,Ronena,12342858,0501218767,-123,13/02/2024".split(",")),
+    Customer(*"Dor,Cohen,12125678,0501297367,-2,13/02/2024".split(","))]
+    command = "select date!=18/01/2024"
+    Commands.select(command, li)
