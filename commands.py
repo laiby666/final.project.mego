@@ -22,7 +22,7 @@ class Commands:
         if command.startswith(("select date=","select date!=")):
             return self.date
     
-    def found(command:str, customers:list[Customer]):
+    def found(command:str, customers:list[Customer])->str:
         found = []
         for customer in customers:
             search = Commands.search(customer, command) 
@@ -34,10 +34,12 @@ class Commands:
                     Commands.sort_list_by_debt(found, customer)
         if not found:
             print("Not found") 
+            return "Not found"
         else:
             [print(customer) for customer in found]
+            return found
 
-    def debt_less_or_more_than(command:str, customers:list[Customer]):
+    def debt_less_or_more_than(command:str, customers:list[Customer])->str:
         found = []
         point = float(command.isdigit())
         for customer in customers:
@@ -49,10 +51,12 @@ class Commands:
                     Commands.sort_list_by_debt(found, customer)
         if not found:
             print("Not found")
+            return "Not found"
         else:
             [print(customer) for customer in found]
+            return found
     
-    def date_before_or_after_this(command:str, customers:list[Customer]):
+    def date_before_or_after_this(command:str, customers:list[Customer])->str:
         p_date = command[-10:]
         p_day = int(p_date[:2])
         p_month = int(p_date[3:5])
@@ -72,8 +76,10 @@ class Commands:
                     Commands.sort_list_by_debt(found, customer)
         if not found:
             print("Not found")
+            return "Not found"
         else:
             [print(customer) for customer in found]
+            return found
                 
     def sort_list_by_debt(list:list[Customer], customer:Customer)->None:
         if not list:
@@ -97,7 +103,7 @@ class Commands:
                 else:
                     j = mid-1
             
-    def select(command:str, customers:list[Customer]):
+    def select(command:str, customers:list[Customer])->str:
         if command.startswith(("select debt<","select debt>")):
             Commands.debt_less_or_more_than(command, customers)
         elif command.startswith(("select date<","select date>")):
@@ -107,7 +113,7 @@ class Commands:
 
     def set(command, customers):
         pass
-    
+
 if __name__ == "__main__":
     li = [Customer(*"Moshe,Cohen,12345678,0501234567,-45,12/02/2024".split(",")),
     Customer(*"Avraham,Levi,12345644,0501234555,300,11/01/2024".split(",")),
