@@ -20,24 +20,24 @@ class Commands:
             else:
                 return str(self.debt)
         if command.startswith(("select date=","select date!=")):
-            return self.date
+            return str(self.date)
     
     def found(command:str, customers:list[Customer])->str:
         found = []
         for customer in customers:
             search = Commands.search(customer, command) 
             if "!=" in command:
-                if search not in command:
+                if str(search) not in command:
                     Commands.sort_list_by_debt(found, customer)
             else:
-                if search in command:
+                if str(search) in command:
                     Commands.sort_list_by_debt(found, customer)
         if not found:
             print("Not found") 
             return "Not found"
         else:
             [print(customer) for customer in found]
-            return found
+            return [str(customer) for customer in found]
 
     def debt_less_or_more_than(command:str, customers:list[Customer])->str:
         found = []
@@ -54,7 +54,7 @@ class Commands:
             return "Not found"
         else:
             [print(customer) for customer in found]
-            return found
+            return [str(customer) for customer in found]
     
     def date_before_or_after_this(command:str, customers:list[Customer])->str:
         p_date = command[-10:]
@@ -79,7 +79,7 @@ class Commands:
             return "Not found"
         else:
             [print(customer) for customer in found]
-            return found
+            return [str(customer) for customer in found]
                 
     def sort_list_by_debt(list:list[Customer], customer:Customer)->None:
         if not list:
@@ -111,8 +111,25 @@ class Commands:
         else:
             Commands.found(command, customers)
 
-    def set(command, customers):
-        pass
+    def set(command:str, customers:list[Customer], filename:str)->None:
+        fields:list[str] = command.split(",")
+        for field in fields:
+            if "first name" in field:
+                first_name = field[field.index("=")+1:]
+            elif "last name" in field or "second name" in field:
+                last_name = field[field.index("=")+1:]
+            elif "id" in field:
+                id = field[field.index("=")+1:]
+            elif "phone" in field:
+                phone = field[field.index("=")+1:]
+            elif "debt" in field:
+                debt = float(field[field.index("=")+1:])
+            elif "date" in field:
+                date = field[field.index("=")+1:]            
+        customer = Customer(first_name, last_name, id, phone, debt, date)
+        with open(filename, "a", encoding="utf-8") as w:
+            w.write(str(customer))
+        Commands.sort_list_by_debt(customers, customer)
 
 if __name__ == "__main__":
     li = [Customer(*"Moshe,Cohen,12345678,0501234567,-45,12/02/2024".split(",")),
@@ -124,5 +141,7 @@ if __name__ == "__main__":
     Customer(*"Koral,Nisim,12712678,0506324567,-255,13/02/2024".split(",")),
     Customer(*"Merav,Ronena,12342858,0501218767,-123,13/02/2024".split(",")),
     Customer(*"Dor,Cohen,12125678,0501297367,-2,13/02/2024".split(","))]
+    command1 = "set first name=Mordoch, second name=Galinsky, id=12977789, phone=0545225456, date=3/4/2022,debt=-300"
+    Commands.set(command1, li, 'DB.csv')
     command = "select date!=18/01/2024"
     Commands.select(command, li)

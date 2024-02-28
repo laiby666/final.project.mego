@@ -24,29 +24,21 @@ with open(csv_file, "r") as fd:
         id = fields[2]
         for customer in customers:
             if customer.id == id:
-                customer.add_debt(int(fields[4]))                
+                customer.add_debt(float(fields[4]))                
                 break
         else:
             customer = Customer(*fields)
             Commands.sort_list_by_debt(customers, customer)
 
-# customers.sort(key=lambda customer: customer.debt)
-for customer in customers:
-    print(customer)
-
-while True:
-    query = input("==> ")
-    if query == "quit":
-        print("Bye")
-        break
-
 def choose_action(client_sock):
     while True:
-        command:str = client_sock.recv(2048)
-        if command.startswith("select"):
-            Commands.select(command, customers)
-        elif command.startswith("set"):
-            Commands.set(command, customers)
+        command:str = client_sock.recv(2048).decode("utf-8")
+        if "select" in command:
+            client_sock.sendall(Commands.select(command, customers).encode("utf-8"))
+        elif "set" in command:
+            Commands.set(command, customers, csv_file)
+            message = "Done".encode("utf-8")
+            client_sock.sendall(message)
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind((host, port))
