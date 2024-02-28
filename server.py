@@ -34,7 +34,7 @@ def choose_action(client_sock):
     while True:
         command:str = client_sock.recv(2048).decode("utf-8")
         if "select" in command:
-            client_sock.sendall(Commands.select(command, customers).encode("utf-8"))
+            Commands.select(command, customers, client_sock)            
         elif "set" in command:
             Commands.set(command, customers, csv_file)
             message = "Done".encode("utf-8")

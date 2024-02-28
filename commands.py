@@ -1,6 +1,6 @@
 from customer import Customer
 import datetime
-import re
+import socket
 
 class Commands:
     def search(self:Customer, command:str)->str:       
@@ -22,24 +22,27 @@ class Commands:
         if command.startswith(("select date=","select date!=")):
             return str(self.date)
     
-    def found(command:str, customers:list[Customer])->str:
+    def found(command:str, customers:list[Customer], client_sock)->str:
         found = []
-        for customer in customers:
-            search = Commands.search(customer, command) 
-            if "!=" in command:
-                if str(search) not in command:
+        if "!=" in command:
+            for customer in customers:
+                search = Commands.search(customer, command)             
+                if search not in command:
                     Commands.sort_list_by_debt(found, customer)
-            else:
-                if str(search) in command:
+        else:
+            for customer in customers:
+                search = Commands.search(customer, command)
+                if search in command:
                     Commands.sort_list_by_debt(found, customer)
         if not found:
-            print("Not found") 
-            return "Not found"
+            client_sock.sendall("Not found".encode("utf-8"))
         else:
-            [print(customer) for customer in found]
-            return [str(customer) for customer in found]
+            to_send = ""
+            for customer in found:
+                to_send += str(customer)
+            client_sock.sendall(to_send.encode("utf-8"))
 
-    def debt_less_or_more_than(command:str, customers:list[Customer])->str:
+    def debt_less_or_more_than(command:str, customers:list[Customer], client_sock)->str:
         found = []
         point = float(command.isdigit())
         for customer in customers:
@@ -50,13 +53,14 @@ class Commands:
                 if customer.debt < point:
                     Commands.sort_list_by_debt(found, customer)
         if not found:
-            print("Not found")
-            return "Not found"
+            client_sock.sendall("Not found".encode("utf-8"))
         else:
-            [print(customer) for customer in found]
-            return [str(customer) for customer in found]
+            to_send = ""
+            for customer in found:
+                to_send += str(customer)
+            client_sock.sendall(to_send.encode("utf-8"))
     
-    def date_before_or_after_this(command:str, customers:list[Customer])->str:
+    def date_before_or_after_this(command:str, customers:list[Customer], client_sock)->str:
         p_date = command[-10:]
         p_day = int(p_date[:2])
         p_month = int(p_date[3:5])
@@ -75,11 +79,12 @@ class Commands:
                 if the_date > point:
                     Commands.sort_list_by_debt(found, customer)
         if not found:
-            print("Not found")
-            return "Not found"
+            client_sock.sendall("Not found".encode("utf-8"))
         else:
-            [print(customer) for customer in found]
-            return [str(customer) for customer in found]
+            to_send = ""
+            for customer in found:
+                to_send += str(customer)
+            client_sock.sendall(to_send.encode("utf-8"))
                 
     def sort_list_by_debt(list:list[Customer], customer:Customer)->None:
         if not list:
@@ -103,13 +108,13 @@ class Commands:
                 else:
                     j = mid-1
             
-    def select(command:str, customers:list[Customer])->str:
+    def select(command:str, customers:list[Customer], client_sock)->str:
         if command.startswith(("select debt<","select debt>")):
-            Commands.debt_less_or_more_than(command, customers)
+            Commands.debt_less_or_more_than(command, customers, client_sock)
         elif command.startswith(("select date<","select date>")):
-            Commands.date_before_or_after_this(command, customers)
+            Commands.date_before_or_after_this(command, customers, client_sock)
         else:
-            Commands.found(command, customers)
+            Commands.found(command, customers, client_sock)
 
     def set(command:str, customers:list[Customer], filename:str)->None:
         fields:list[str] = command.split(",")
@@ -126,7 +131,7 @@ class Commands:
                 debt = float(field[field.index("=")+1:])
             elif "date" in field:
                 date = field[field.index("=")+1:]            
-        customer = Customer(first_name, last_name, id, phone, debt, date)
+        customer = Customer(first_name.title(), last_name.title(), id, phone, debt, date)
         with open(filename, "a", encoding="utf-8") as w:
             w.write(str(customer))
         Commands.sort_list_by_debt(customers, customer)
@@ -144,4 +149,4 @@ if __name__ == "__main__":
     command1 = "set first name=Mordoch, second name=Galinsky, id=12977789, phone=0545225456, date=3/4/2022,debt=-300"
     Commands.set(command1, li, 'DB.csv')
     command = "select date!=18/01/2024"
-    Commands.select(command, li)
+    print(Commands.select(command, li))
