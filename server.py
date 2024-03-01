@@ -16,7 +16,6 @@ if not os.path.exists(csv_file):
     with open(csv_file, "w"):
         pass
 
-
 customers:list[Customer] = []
 with open(csv_file, "r") as fd:
     for line in fd.readlines():
@@ -32,13 +31,12 @@ with open(csv_file, "r") as fd:
 
 def choose_action(client_sock):
     while True:
-        command:str = client_sock.recv(2048).decode("utf-8")
+        command:Commands = client_sock.recv(2048).decode("utf-8")
         if "select" in command:
             Commands.select(command, customers, client_sock)            
         elif "set" in command:
-            Commands.set(command, customers, csv_file)
-            message = "Done".encode("utf-8")
-            client_sock.sendall(message)
+            if command.valid_command(customers, client_sock):
+                Commands.set(command, customers, csv_file)
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind((host, port))

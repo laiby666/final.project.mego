@@ -68,9 +68,10 @@ class Commands:
         point = datetime.date(p_year, p_month, p_day)
         found = []
         for customer in customers:
-            day = int(customer.date[:2])
-            month = int(customer.date[3:5])
-            year = int(customer.date[6:])
+            spl = customer.date.split("/")
+            day = int(spl[0])
+            month = int(spl[1])
+            year = int(spl[2])
             the_date = datetime.date(year, month, day)
             if "<" in command:
                 if the_date < point:
@@ -108,7 +109,7 @@ class Commands:
                 else:
                     j = mid-1
             
-    def select(command:str, customers:list[Customer], client_sock)->str:
+    def select(command:str, customers:list[Customer], client_sock:socket)->str:
         if command.startswith(("select debt<","select debt>")):
             Commands.debt_less_or_more_than(command, customers, client_sock)
         elif command.startswith(("select date<","select date>")):
@@ -136,6 +137,54 @@ class Commands:
             w.write(str(customer))
         Commands.sort_list_by_debt(customers, customer)
 
+    def valid_command(command:str, customers:list[Customer], client_sock:socket)->bool:
+        fields:list[str] = command.split(",")
+        for field in fields:
+            if "first name" in field:
+                first_name = field[field.index("=")+1:]
+            elif "last name" in field or "second name" in field:
+                last_name = field[field.index("=")+1:]
+            elif "id" in field:
+                id = field[field.index("=")+1:]
+            elif "phone" in field:
+                phone = field[field.index("=")+1:]
+            elif "debt" in field:
+                debt = float(field[field.index("=")+1:])
+            elif "date" in field:
+                date1 = field[field.index("=")+1:].split("/") 
+                day = int(date1[0])
+                month = int(date1[1])
+                year = int(date1[2])
+                the_date = datetime.date(year, month, day)
+        to_send = ""
+        if not id.isdigit() or len(id) != 9:
+            client_sock.sendall("Invalid ID".encode("utf-8"))
+            return False
+        if not phone.isdigit() or len(phone) != 10 or not phone.startswith("0"):
+            client_sock.sendall("Invalid phone number".encode("utf-8"))
+            return False
+        if not debt:
+            client_sock.sendall("Missing debt".encode("utf-8"))
+            return False
+        if not the_date or not isinstance(the_date, datetime):
+            client_sock.sendall("Invalid date".encode("utf-8"))
+            return False
+        if not first_name or not last_name:
+            client_sock.sendall("Missing name".encode("utf-8"))
+            return False
+        for customer in customers:
+            if customer.id == id:
+                if customer.phone != phone:
+                    customer.phone = phone
+                    to_send += "Phone number has been updated."
+                if customer.first_name != first_name or customer.last_name != last_name:
+                    to_send += "The name entered is different from the name entered previously."        
+        to_send += "Done."
+        client_sock.sendall(to_send.encode("utf-8"))
+        return True
+
+
+            
 if __name__ == "__main__":
     li = [Customer(*"Moshe,Cohen,12345678,0501234567,-45,12/02/2024".split(",")),
     Customer(*"Avraham,Levi,12345644,0501234555,300,11/01/2024".split(",")),

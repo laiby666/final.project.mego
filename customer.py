@@ -1,4 +1,3 @@
-
 class Customer:
     def __init__(self, first_name, last_name, id, phone, debt, the_date) -> None:
         self._first_name = first_name
