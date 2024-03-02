@@ -21,6 +21,8 @@ class Commands:
                 return str(self.debt)
         if command.startswith(("select date=","select date!=")):
             return str(self.date)
+        else:
+            return "Wrong command"
     
     def found(command:str, customers:list[Customer], client_sock)->str:
         found = []
@@ -138,7 +140,13 @@ class Commands:
         Commands.sort_list_by_debt(customers, customer)
 
     def valid_command(command:str, customers:list[Customer], client_sock:socket)->bool:
-        fields:list[str] = command.split(",")
+        first_name=""
+        last_name=""
+        id = ""
+        phone=""
+        debt=0
+        the_date=""
+        fields:list[str] = command.split(",")        
         for field in fields:
             if "first name" in field:
                 first_name = field[field.index("=")+1:]
@@ -163,10 +171,10 @@ class Commands:
         if not phone.isdigit() or len(phone) != 10 or not phone.startswith("0"):
             client_sock.sendall("Invalid phone number".encode("utf-8"))
             return False
-        if not debt:
+        if debt == 0:
             client_sock.sendall("Missing debt".encode("utf-8"))
             return False
-        if not the_date or not isinstance(the_date, datetime):
+        if not the_date or not isinstance(the_date, datetime.date):
             client_sock.sendall("Invalid date".encode("utf-8"))
             return False
         if not first_name or not last_name:
@@ -182,20 +190,3 @@ class Commands:
         to_send += "Done."
         client_sock.sendall(to_send.encode("utf-8"))
         return True
-
-
-            
-if __name__ == "__main__":
-    li = [Customer(*"Moshe,Cohen,12345678,0501234567,-45,12/02/2024".split(",")),
-    Customer(*"Avraham,Levi,12345644,0501234555,300,11/01/2024".split(",")),
-    Customer(*"Meir,Reich,12345655,0501234444,-500,12/01/2024".split(",")),
-    Customer(*"Noach,Paloch,12345666,0501234566,-255,12/02/2024".split(",")),
-    Customer(*"Moshe,Cohen,12345678,0501234567,-55,13/02/2024".split(",")),
-    Customer(*"Mali,Cohen,57235678,0501987667,8000,13/02/2024".split(",")),
-    Customer(*"Koral,Nisim,12712678,0506324567,-255,13/02/2024".split(",")),
-    Customer(*"Merav,Ronena,12342858,0501218767,-123,13/02/2024".split(",")),
-    Customer(*"Dor,Cohen,12125678,0501297367,-2,13/02/2024".split(","))]
-    command1 = "set first name=Mordoch, second name=Galinsky, id=12977789, phone=0545225456, date=3/4/2022,debt=-300"
-    Commands.set(command1, li, 'DB.csv')
-    command = "select date!=18/01/2024"
-    print(Commands.select(command, li))

@@ -35,7 +35,7 @@ def choose_action(client_sock):
         if "select" in command:
             Commands.select(command, customers, client_sock)            
         elif "set" in command:
-            if command.valid_command(customers, client_sock):
+            if Commands.valid_command(command, customers, client_sock):
                 Commands.set(command, customers, csv_file)
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
