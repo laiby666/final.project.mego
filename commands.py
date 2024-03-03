@@ -134,9 +134,9 @@ class Commands:
             elif "last name" in field or "second name" in field:
                 last_name = field[field.index("=")+1:]
             elif "id" in field:
-                id = field[field.index("=")+1:]
+                id = field[field.index("=")+1:].strip()
             elif "phone" in field:
-                phone = field[field.index("=")+1:]
+                phone = field[field.index("=")+1:].strip()
             elif "debt" in field:
                 debt = float(field[field.index("=")+1:])
             elif "date" in field:
@@ -160,9 +160,9 @@ class Commands:
             elif "last name" in field or "second name" in field:
                 last_name = field[field.index("=")+1:]
             elif "id" in field:
-                id = field[field.index("=")+1:]
+                id = field[field.index("=")+1:].strip()
             elif "phone" in field:
-                phone = field[field.index("=")+1:]
+                phone = field[field.index("=")+1:].strip()
             elif "debt" in field:
                 debt = float(field[field.index("=")+1:])
             elif "date" in field:
@@ -199,6 +199,8 @@ class Commands:
                 to_send += "Set is done."
                 client_sock.sendall(to_send.encode("utf-8"))
                 return False
+        to_send += "Set is done."
+        client_sock.sendall(to_send.encode("utf-8"))
         return True
 
     def print_data(customers, client_sock):
