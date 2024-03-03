@@ -5,9 +5,11 @@ import socket
 class Commands:
     def search(self:Customer, command:str)->str:       
         if command.startswith("select first name"):
-            return self.first_name               
+            FN = self.first_name.lower()
+            return FN               
         if command.startswith("select last name"):
-            return self.last_name
+            LN = self.last_name.lower()
+            return LN
         if command.startswith("select id"):
             return self.id
         if command.startswith("select phone"):
@@ -28,7 +30,7 @@ class Commands:
         found = []
         if "!=" in command:
             for customer in customers:
-                search = Commands.search(customer, command)             
+                search = Commands.search(customer, command)           
                 if search not in command:
                     Commands.sort_list_by_debt(found, customer)
         else:
@@ -183,8 +185,12 @@ class Commands:
                 if customer.phone != phone:
                     customer.phone = phone
                     to_send += "Phone number has been updated. "
-                if customer.first_name != first_name or customer.last_name != last_name:
+                if customer.first_name != first_name.title() or customer.last_name != last_name.title():
                     to_send += "The name entered is different from the name entered previously. "        
         to_send += "Set is done."
         client_sock.sendall(to_send.encode("utf-8"))
         return True
+
+    def print_data(customers):
+        for customer in customers:
+            print(customer)

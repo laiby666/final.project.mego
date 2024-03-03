@@ -28,11 +28,15 @@ with open(csv_file, "r") as fd:
         else:
             customer = Customer(*fields)
             Commands.sort_list_by_debt(customers, customer)
+
 mutex = threading.Lock()
 def choose_action(client_sock):
     while True:
-        command:Commands = client_sock.recv(2048).decode("utf-8")
-        if "select" in command:
+        command:str = client_sock.recv(2048).decode("utf-8")
+        command.lower()
+        if command == "print":
+            Commands.print_data(customers)
+        elif "select" in command:
             Commands.select(command, customers, client_sock)            
         elif "set" in command:
             if Commands.valid_command(command, customers, client_sock):

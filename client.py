@@ -9,4 +9,4 @@ while True:
     command = input("==>").encode('utf-8')
     client_socket.sendall(command)
     data = client_socket.recv(2048)
-    print("\r<=" + data.decode('utf-8'), end="\n=>")
+    print("\r<=" + data.decode('utf-8'))
