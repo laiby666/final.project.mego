@@ -3,6 +3,9 @@ import datetime
 import socket
 
 class Commands:
+    def add_debt(self:Customer, debt:float, customers:list[Customer]):
+        self._debt += debt
+
     def search(self:Customer, command:str)->str:       
         if command.startswith("select first name"):
             FN = self.first_name.lower()
@@ -191,6 +194,8 @@ class Commands:
         client_sock.sendall(to_send.encode("utf-8"))
         return True
 
-    def print_data(customers):
+    def print_data(customers, client_sock):
+        to_send = ""
         for customer in customers:
-            print(customer)
+            to_send += str(customer)
+        client_sock.sendall(to_send.encode("utf-8"))

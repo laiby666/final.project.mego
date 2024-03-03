@@ -19,15 +19,9 @@ if not os.path.exists(csv_file):
 customers:list[Customer] = []
 with open(csv_file, "r") as fd:
     for line in fd.readlines():
-        fields = line.split(",")
-        id = fields[2]
-        for customer in customers:
-            if customer.id == id:
-                customer.add_debt(float(fields[4]))                
-                break
-        else:
-            customer = Customer(*fields)
-            Commands.sort_list_by_debt(customers, customer)
+        fields = line.split(",")        
+        customer = Customer(*fields)
+        Commands.sort_list_by_debt(customers, customer)
 
 mutex = threading.Lock()
 def choose_action(client_sock):
@@ -35,7 +29,7 @@ def choose_action(client_sock):
         command:str = client_sock.recv(2048).decode("utf-8")
         command.lower()
         if command == "print":
-            Commands.print_data(customers)
+            Commands.print_data(customers, client_sock)
         elif "select" in command:
             Commands.select(command, customers, client_sock)            
         elif "set" in command:
