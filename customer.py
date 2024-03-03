@@ -27,4 +27,4 @@ class Customer:
         return self._date
 
     def __str__(self):
-        return f'''{self.first_name},{self.last_name},{self.id},{self.phone},{self.debt},{self.date}\n'''
+        return f'''{self.first_name},{self.last_name},{self.id},{self.phone},{self.debt},{self.date}'''

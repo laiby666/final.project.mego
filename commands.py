@@ -5,6 +5,8 @@ import socket
 class Commands:
     def add_debt(self:Customer, debt:float, customers:list[Customer]):
         self._debt += debt
+        customers.remove(self)
+        Commands.sort_list_by_debt(customers, self)
 
     def search(self:Customer, command:str)->str:       
         if command.startswith("select first name"):
@@ -144,7 +146,7 @@ class Commands:
             w.write(str(customer))
         Commands.sort_list_by_debt(customers, customer)
 
-    def valid_command(command:str, customers:list[Customer], client_sock:socket)->bool:
+    def valid_command(command:str, customers:list[Customer], client_sock:socket, filename)->bool:
         first_name=""
         last_name=""
         id = ""
@@ -189,9 +191,14 @@ class Commands:
                     customer.phone = phone
                     to_send += "Phone number has been updated. "
                 if customer.first_name != first_name.title() or customer.last_name != last_name.title():
-                    to_send += "The name entered is different from the name entered previously. "        
-        to_send += "Set is done."
-        client_sock.sendall(to_send.encode("utf-8"))
+                    to_send += "The name entered is different from the name entered previously. " 
+                write_to_file = Customer(first_name.title(), last_name.title(), id, phone, debt, the_date)
+                with open(filename, "a", encoding="utf-8") as w:
+                    w.write(str(write_to_file))
+                Commands.add_debt(customer, debt, customers)
+                to_send += "Set is done."
+                client_sock.sendall(to_send.encode("utf-8"))
+                return False
         return True
 
     def print_data(customers, client_sock):
