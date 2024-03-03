@@ -166,27 +166,25 @@ class Commands:
                 the_date = datetime.date(year, month, day)
         to_send = ""
         if not id.isdigit() or len(id) != 9:
-            client_sock.sendall("Invalid ID".encode("utf-8"))
-            return False
+            to_send += "Invalid ID. "           
         if not phone.isdigit() or len(phone) != 10 or not phone.startswith("0"):
-            client_sock.sendall("Invalid phone number".encode("utf-8"))
-            return False
+            to_send += "Invalid phone number. "            
         if debt == 0:
-            client_sock.sendall("Missing debt".encode("utf-8"))
-            return False
+            to_send += "Missing debt. "
         if not the_date or not isinstance(the_date, datetime.date):
-            client_sock.sendall("Invalid date".encode("utf-8"))
-            return False
+            to_send += "Invalid date. "
         if not first_name or not last_name:
-            client_sock.sendall("Missing name".encode("utf-8"))
+            to_send += "Missing name. "
+        if to_send:
+            client_sock.sendall(to_send.encode("utf-8"))
             return False
         for customer in customers:
             if customer.id == id:
                 if customer.phone != phone:
                     customer.phone = phone
-                    to_send += "Phone number has been updated."
+                    to_send += "Phone number has been updated. "
                 if customer.first_name != first_name or customer.last_name != last_name:
-                    to_send += "The name entered is different from the name entered previously."        
-        to_send += "Done."
+                    to_send += "The name entered is different from the name entered previously. "        
+        to_send += "Set is done."
         client_sock.sendall(to_send.encode("utf-8"))
         return True

@@ -28,7 +28,7 @@ with open(csv_file, "r") as fd:
         else:
             customer = Customer(*fields)
             Commands.sort_list_by_debt(customers, customer)
-
+mutex = threading.Lock()
 def choose_action(client_sock):
     while True:
         command:Commands = client_sock.recv(2048).decode("utf-8")
@@ -36,7 +36,8 @@ def choose_action(client_sock):
             Commands.select(command, customers, client_sock)            
         elif "set" in command:
             if Commands.valid_command(command, customers, client_sock):
-                Commands.set(command, customers, csv_file)
+                with mutex:
+                    Commands.set(command, customers, csv_file)
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind((host, port))
