@@ -70,10 +70,14 @@ class Commands:
             client_sock.sendall(to_send.encode("utf-8"))
     
     def date_before_or_after_this(command:str, customers:list[Customer], client_sock)->str:
-        p_date = command[-10:]
-        p_day = int(p_date[:2])
-        p_month = int(p_date[3:5])
-        p_year = int(p_date[6:])
+        if "<" in command:
+            p_date = command[command.index("<")+1:]
+        if ">" in command:
+            p_date = command[command.index(">")+1:]
+        t_date = p_date.split("/")
+        p_day = int(t_date[0])
+        p_month = int(t_date[1])
+        p_year = int(t_date[2])
         point = datetime.date(p_year, p_month, p_day)
         found = []
         for customer in customers:
